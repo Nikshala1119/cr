@@ -94,6 +94,9 @@ const CarromBoard = ({ multiplayerManager, gameState, onScoreUpdate, onTurnEnd }
   const handleStart = useCallback((clientX, clientY) => {
     if (!canShoot || !physicsRef.current) return;
 
+    // Check if it's player's turn in multiplayer mode
+    if (multiplayerManager && gameState && !gameState.isMyTurn) return;
+
     const rect = canvasContainerRef.current.getBoundingClientRect();
     const x = clientX - rect.left;
     const y = clientY - rect.top;
@@ -111,7 +114,7 @@ const CarromBoard = ({ multiplayerManager, gameState, onScoreUpdate, onTurnEnd }
         setAimCurrent({ x, y });
       }
     }
-  }, [canShoot]);
+  }, [canShoot, multiplayerManager, gameState]);
 
   // Handle touch/mouse move
   const handleMove = useCallback((clientX, clientY) => {
@@ -243,9 +246,15 @@ const CarromBoard = ({ multiplayerManager, gameState, onScoreUpdate, onTurnEnd }
           </div>
         )}
 
-        {canShoot && (
+        {canShoot && (!multiplayerManager || (gameState && gameState.isMyTurn)) && (
           <div className="status-message active">
             Drag striker to aim and shoot!
+          </div>
+        )}
+
+        {canShoot && multiplayerManager && gameState && !gameState.isMyTurn && (
+          <div className="status-message">
+            Opponent's turn...
           </div>
         )}
       </div>
@@ -314,7 +323,7 @@ const CarromBoard = ({ multiplayerManager, gameState, onScoreUpdate, onTurnEnd }
         <button
           className="control-btn"
           onClick={resetStriker}
-          disabled={!canShoot}
+          disabled={!canShoot || (multiplayerManager && gameState && !gameState.isMyTurn)}
         >
           🔄 Reset Striker
         </button>
