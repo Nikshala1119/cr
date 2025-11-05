@@ -64,6 +64,8 @@ const CarromBoard = ({ multiplayerManager, gameState, onScoreUpdate, onTurnEnd }
     const checkMovement = () => {
       if (physicsRef.current && !physicsRef.current.isAnyMoving()) {
         if (!canShoot) {
+          // Create new striker for next turn
+          physicsRef.current.createStriker(strikerPosition);
           setCanShoot(true);
           if (onTurnEnd) {
             onTurnEnd();
@@ -85,6 +87,7 @@ const CarromBoard = ({ multiplayerManager, gameState, onScoreUpdate, onTurnEnd }
         physicsRef.current.cleanup();
       }
     };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Handle touch/mouse start
